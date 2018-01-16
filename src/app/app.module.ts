@@ -13,12 +13,14 @@ import { FuseNavigationService } from './core/components/navigation/navigation.s
 import { FuseNavbarVerticalService } from './main/navbar/vertical/navbar-vertical.service';
 import { TranslateModule } from '@ngx-translate/core';
 
-import { FuseFakeDbService } from './fuse-fake-db/fuse-fake-db.service';
-import { InMemoryWebApiModule } from 'angular-in-memory-web-api';
+import { LoginModule } from './authorization/login/login.module';
+import { RegisterModule } from './authorization/register/register.module';
 
 import { ClientsModule } from './main/content/clients/clients.module';
 
 const appRoutes: Routes = [
+  
+    
     {
         path: 'home',
         loadChildren: './main/content/home/home.module#HomeModule'
@@ -30,11 +32,6 @@ const appRoutes: Routes = [
     {
         path: 'events',
         loadChildren: './main/content/events/events.module#EventsModule'
-    },
-    {
-        path: '**',
-        redirectTo: '/home',
-        pathMatch: 'full'
     }
 ];
 
@@ -51,10 +48,8 @@ const appRoutes: Routes = [
         SharedModule,
         TranslateModule.forRoot(),
         FuseMainModule,
-        InMemoryWebApiModule.forRoot(FuseFakeDbService, {
-            delay             : 0,
-            passThruUnknownUrl: true
-        }),
+        LoginModule,
+        RegisterModule
     ],
     providers   : [
         FuseSplashScreenService,
