@@ -1,79 +1,123 @@
-import { Component, Inject } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import {
-    AuthenticationDetails, 
-    CognitoIdentityServiceProvider, 
-    CognitoUser,
-    CognitoUserAttribute,
-    CognitoUserPool
-} from 'amazon-cognito-identity-js';
+import { Component, OnInit } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FuseConfigService } from '../../core/services/config.service';
+import { fuseAnimations } from '../../core/animations';
 
-
-
-class RegisterUserModel{
-    userName: String;
-    password: String;
-}
-
+import { CognitoService } from '../authservices/cognito.service';
+import { Router } from '@angular/router';
 
 @Component({
-    selector   : 'dj-register',
+    selector   : 'dj-registration',
     templateUrl: './register.component.html',
-    styleUrls  : ['./register.component.scss']
+    styleUrls  : ['./register.component.scss'],
+    animations : fuseAnimations
 })
-
-export class RegisterComponent
+export class RegistrationComponent implements OnInit
 {
     registerForm: FormGroup;
-    registrationUser: RegisterUserModel;
+    registerFormErrors: any;
 
-    constructor(@Inject(FormBuilder) fb: FormBuilder) {
-        this.registerForm = fb.group({
-         userName: '',
-         password: ''
-        });
-      }
-
-      onInit(){
-          this.registrationUser = new RegisterUserModel();
-         
-      }
-    
-      onRegister(){
-          console.log(this.registerForm.value);
-          this.registerUser();
-        console.log('Clicked Register');
-      }
-
-      registerUser(){
-        const poolData = {
-            UserPoolId: 'us-east-1_csVxlykxq',
-            ClientId: '4688a36hoavfu52j59pjuntc99'
-        };
-
-        const userPool = new CognitoUserPool(poolData);
-        const userName = this.registerForm.get('userName').value;
-        const password = this.registerForm.get('password').value;
-        var attrList = [];
-
-        const dataEmail = {
-            Name: 'email',
-            Value: this.registerForm.get('userName').value
-        };
-
-        const attrEmail = new CognitoUserAttribute(dataEmail);
-
-        attrList.push(dataEmail);
-
-        userPool.signUp(userName, password, attrList, null, (err, result) => {
-            if (err){
-                alert(err);
-                return;
+    constructor(
+        private fuseConfig: FuseConfigService,
+        private formBuilder: FormBuilder,
+        private cognitoService: CognitoService,
+        private router: Router
+    )
+    {
+        this.fuseConfig.setSettings({
+            layout: {
+                navigation: 'none',
+                toolbar   : 'none',
+                footer    : 'none'
             }
-            const cognitoUser = result.user;
-            console.log('Username is ' + cognitoUser.getUsername);
         });
 
+        this.registerFormErrors = {
+            name           : {},
+            email          : {},
+            password       : {},
+            passwordConfirm: {}
+        };
+    }
 
-      }
+    ngOnInit()
+    {
+        this.registerForm = this.formBuilder.group({
+            name           : ['', Validators.required],
+            email          : ['', [Validators.required, Validators.email]],
+            password       : ['', Validators.required],
+            passwordConfirm: ['', [Validators.required, confirmPassword]]
+        });
+
+        this.registerForm.valueChanges.subscribe(() => {
+            this.onRegisterFormValuesChanged();
+        });
+    }
+
+    onRegisterFormValuesChanged()
+    {
+        for ( const field in this.registerFormErrors )
+        {
+            if ( !this.registerFormErrors.hasOwnProperty(field) )
+            {
+                continue;
+            }
+
+            // Clear previous errors
+            this.registerFormErrors[field] = {};
+
+            // Get the control
+            const control = this.registerForm.get(field);
+
+            if ( control && control.dirty && !control.valid )
+            {
+                this.registerFormErrors[field] = control.errors;
+            }
+        }
+    }
+
+    onRegister(){
+        // console.log(this.registerForm.value);
+        this.cognitoService.registerUser(this.registerForm.value, (err, result) =>
+            {
+                if (err) {
+                    console.log(err);
+                    // TODO - Add Error Message Service
+                    return;
+                }
+                const user = result.user;
+                console.log(user.email);
+                console.log('redirecting...');
+                this.router.navigate(['/register/confirm'], result.user.email);
+            });
+   
+    }
+}
+
+function confirmPassword(control: AbstractControl)
+{
+    if ( !control.parent || !control )
+    {
+        return;
+    }
+
+    const password = control.parent.get('password');
+    const passwordConfirm = control.parent.get('passwordConfirm');
+
+    if ( !password || !passwordConfirm )
+    {
+        return;
+    }
+
+    if ( passwordConfirm.value === '' )
+    {
+        return;
+    }
+
+    if ( password.value !== passwordConfirm.value )
+    {
+        return {
+            passwordsNotMatch: true
+        };
+    }
 }

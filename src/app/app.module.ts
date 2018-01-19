@@ -7,20 +7,35 @@ import 'hammerjs';
 import { SharedModule } from './core/modules/shared.module';
 import { AppComponent } from './app.component';
 import { FuseMainModule } from './main/main.module';
+import { TranslateModule } from '@ngx-translate/core';
+
+// Template Services
 import { FuseSplashScreenService } from './core/services/splash-screen.service';
 import { FuseConfigService } from './core/services/config.service';
 import { FuseNavigationService } from './core/components/navigation/navigation.service';
 import { FuseNavbarVerticalService } from './main/navbar/vertical/navbar-vertical.service';
-import { TranslateModule } from '@ngx-translate/core';
 
-import { LoginModule } from './authorization/login/login.module';
-import { RegisterModule } from './authorization/register/register.module';
+// Authoriziation Services
+import { CognitoService } from './authorization/authservices/cognito.service';
 
-import { ClientsModule } from './main/content/clients/clients.module';
+// Custom Components
+
 
 const appRoutes: Routes = [
-  
     
+    {
+        path: '',
+        redirectTo: '/home',
+        pathMatch: 'full'
+    },
+    {
+        path: 'register',
+        loadChildren: './authorization/register/register.module#RegisterModule'
+    },
+    {
+        path: 'login',
+        loadChildren: './authorization/login/login.module#LoginModule'
+    },
     {
         path: 'home',
         loadChildren: './main/content/home/home.module#HomeModule'
@@ -47,15 +62,14 @@ const appRoutes: Routes = [
         RouterModule.forRoot(appRoutes),
         SharedModule,
         TranslateModule.forRoot(),
-        FuseMainModule,
-        LoginModule,
-        RegisterModule
+        FuseMainModule
     ],
     providers   : [
         FuseSplashScreenService,
         FuseConfigService,
         FuseNavigationService,
-        FuseNavbarVerticalService
+        FuseNavbarVerticalService,
+        CognitoService
     ],
     bootstrap   : [
         AppComponent
