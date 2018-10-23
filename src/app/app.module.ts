@@ -6,7 +6,6 @@ import { RouterModule, Routes } from '@angular/router';
 import 'hammerjs';
 import { SharedModule } from './core/modules/shared.module';
 import { AppComponent } from './app.component';
-import { FuseMainModule } from './main/main.module';
 import { TranslateModule } from '@ngx-translate/core';
 
 // Template Services
@@ -16,18 +15,17 @@ import { FuseNavigationService } from './core/components/navigation/navigation.s
 import { FuseNavbarVerticalService } from './main/navbar/vertical/navbar-vertical.service';
 
 // Authoriziation Services
-import { CognitoService } from './authorization/authservices/cognito.service';
-
+import { RegistrationService } from './authorization/authservices/registration.service';
+import { LoginService } from './authorization/authservices/loginservice.service';
+import { AuthGuard } from './authorization/authservices/authGuard.service';
+import { CognitoUtil } from './authorization/authservices/cognitoUtil.service';
+ 
 // Custom Components
-
+import { FuseMainComponent } from './main/main.component';
+import { FuseMainModule } from './main/main.module';
 
 const appRoutes: Routes = [
-    
-    {
-        path: '',
-        redirectTo: '/home',
-        pathMatch: 'full'
-    },
+
     {
         path: 'register',
         loadChildren: './authorization/register/register.module#RegisterModule'
@@ -37,23 +35,31 @@ const appRoutes: Routes = [
         loadChildren: './authorization/login/login.module#LoginModule'
     },
     {
-        path: 'home',
-        loadChildren: './main/content/home/home.module#HomeModule'
+        path: '',
+        component: FuseMainComponent,
+        children: 
+        [
+            {
+                path: 'home',
+                loadChildren: './main/content/home/home.module#HomeModule'
+            },
+            {
+                path: 'clients',
+                loadChildren: './main/content/clients/clients.module#ClientsModule'
+            }
+        ]
     },
     {
-        path: 'clients',
-        loadChildren: './main/content/clients/clients.module#ClientsModule'
-    },
-    {
-        path: 'events',
-        loadChildren: './main/content/events/events.module#EventsModule'
+        path: '**',
+        redirectTo: '',
+        pathMatch: 'full'
     }
+
 ];
 
 @NgModule({
     declarations: [
-        AppComponent,
-        
+        AppComponent
     ],
     imports     : [
         BrowserModule,
@@ -69,7 +75,10 @@ const appRoutes: Routes = [
         FuseConfigService,
         FuseNavigationService,
         FuseNavbarVerticalService,
-        CognitoService
+        RegistrationService,
+        LoginService,
+        AuthGuard,
+        CognitoUtil
     ],
     bootstrap   : [
         AppComponent

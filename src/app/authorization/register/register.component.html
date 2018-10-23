@@ -11,8 +11,7 @@
         </div>
 
         <div class="description" *fuseIfOnDom [@animate]="{value:'*',params:{delay:'100ms',y:'25px'}}">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ullamcorper nisl erat,
-            vel convallis elit fermentum pellentesque. Sed mollis velit facilisis facilisis viverra.
+           The first and only CRM for Disc Jockeys
         </div>
 
     </div>
@@ -31,9 +30,9 @@
             <form name="registerForm" [formGroup]="registerForm" novalidate>
 
                 <mat-form-field>
-                    <input matInput placeholder="Name" formControlName="name">
+                    <input matInput placeholder="Username" formControlName="username">
                     <mat-error *ngIf="registerFormErrors.name.required">
-                        Name is required
+                        Username is required
                     </mat-error>
                 </mat-form-field>
 
@@ -65,7 +64,7 @@
                 </mat-form-field>
 
                 <div class="terms" fxLayout="row" fxLayoutAlign="center center">
-                    <mat-checkbox name="terms" aria-label="Accept" required>
+                    <mat-checkbox formControlName="termsAndConditions" aria-label="Accept" required>
                         <span>Accept</span>
                     </mat-checkbox>
                     <a href="#">terms and conditions</a>
@@ -80,7 +79,7 @@
 
             <div class="register" fxLayout="column" fxLayoutAlign="center center">
                 <span class="text">Already have an account?</span>
-                <a class="link" [routerLink]="'/login'">Login</a>
+                <a class="link" [routerLink]="['/login']">Login</a>
             </div>
         </div>
     </div>

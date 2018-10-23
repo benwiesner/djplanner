@@ -12,16 +12,23 @@
 
             <div class="subtitle">
                 <p>
-                    A confirmation e-mail has been sent to <b>example@mymail.com</b>.
+                    A confirmation code has been sent to <b>{{user.email}}.</b>
                 </p>
                 <p>
-                    Check your inbox and click on the "Confirm my email" link to confirm your email address.
+                    Please enter your code below to verify your account.
                 </p>
+                <form [formGroup]="confirmationForm">
+                    <mat-form-field>
+                        <input class="confirmationCodeInput" formControlName="confirmationCode" matInput autofocus>
+                    </mat-form-field>
+                </form>
             </div>
 
-            <div class="message">
-                <a class="link" [routerLink]="'/login'">Go back to login page</a>
+           <button (click)="verifyUser()" mat-raised-button>Submit</button>
+           <!--<div class="message">
+                <a class="link" ref="#">Didn't an recieve email? Click here to resend.</a>
             </div>
+        -->
 
         </div>
 

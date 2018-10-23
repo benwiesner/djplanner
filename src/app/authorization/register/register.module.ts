@@ -5,14 +5,15 @@ import { RouterModule, Routes } from '@angular/router';
 import { RegistrationComponent } from './register.component';
 
 const appRoutes: Routes = [
-    {
-        path     : '',
-        component: RegistrationComponent
-    },
+  
     {
         path: 'confirm',
         loadChildren: './mail-confirm/mail-confirm.module#MailConfirmModule'
-    }
+    },
+    {
+        path     : '**',
+        component: RegistrationComponent
+    },
 ];
 
 @NgModule({

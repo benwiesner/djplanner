@@ -2,18 +2,18 @@ import { NgModule } from '@angular/core';
 import { SharedModule } from '../../../core/modules/shared.module';
 import { RouterModule } from '@angular/router';
 
-import { FuseMailConfirmComponent } from './mail-confirm.component';
+import { MailConfirmComponent } from './mail-confirm.component';
 
 const routes = [
     {
-        path     : '',
-        component: FuseMailConfirmComponent
+        path     : '**',
+        component: MailConfirmComponent
     }
 ];
 
 @NgModule({
     declarations: [
-        FuseMailConfirmComponent
+        MailConfirmComponent
     ],
     imports     : [
         SharedModule,

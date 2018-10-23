@@ -4,6 +4,8 @@ import { FuseConfigService } from '../core/services/config.service';
 import { Platform } from '@angular/cdk/platform';
 import { DOCUMENT } from '@angular/common';
 
+
+
 @Component({
     selector     : 'fuse-main',
     templateUrl  : './main.component.html',

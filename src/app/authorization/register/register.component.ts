@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { FuseConfigService } from '../../core/services/config.service';
 import { fuseAnimations } from '../../core/animations';
 
-import { CognitoService } from '../authservices/cognito.service';
+import { RegistrationService } from '../authservices/registration.service';
 import { Router } from '@angular/router';
+
+import { User } from '../models/user.model';
 
 @Component({
     selector   : 'dj-registration',
@@ -18,21 +19,12 @@ export class RegistrationComponent implements OnInit
     registerFormErrors: any;
 
     constructor(
-        private fuseConfig: FuseConfigService,
         private formBuilder: FormBuilder,
-        private cognitoService: CognitoService,
+        private registrationService: RegistrationService,
         private router: Router
     )
     {
-        this.fuseConfig.setSettings({
-            layout: {
-                navigation: 'none',
-                toolbar   : 'none',
-                footer    : 'none'
-            }
-        });
-
-        this.registerFormErrors = {
+    this.registerFormErrors = {
             name           : {},
             email          : {},
             password       : {},
@@ -43,10 +35,11 @@ export class RegistrationComponent implements OnInit
     ngOnInit()
     {
         this.registerForm = this.formBuilder.group({
-            name           : ['', Validators.required],
+            username           : ['', Validators.required],
             email          : ['', [Validators.required, Validators.email]],
             password       : ['', Validators.required],
-            passwordConfirm: ['', [Validators.required, confirmPassword]]
+            passwordConfirm: ['', [Validators.required, confirmPassword]],
+            termsAndConditions : [false, [Validators.required]]
         });
 
         this.registerForm.valueChanges.subscribe(() => {
@@ -76,21 +69,29 @@ export class RegistrationComponent implements OnInit
         }
     }
 
+    // Create New User
     onRegister(){
-        // console.log(this.registerForm.value);
-        this.cognitoService.registerUser(this.registerForm.value, (err, result) =>
+        
+        const registeredUser = new User();
+
+        // Assign DOM to Data Model
+        Object.assign(registeredUser, this.registerForm.value);
+    
+       this.registrationService.registerUser(this.registerForm.value, (err, result) =>
             {
                 if (err) {
                     console.log(err);
                     // TODO - Add Error Message Service
                     return;
                 }
-                const user = result.user;
-                console.log(user.email);
                 console.log('redirecting...');
-                this.router.navigate(['/register/confirm'], result.user.email);
+
+                 // Transfer Data To Confirmation Observable
+                this.registrationService.transferUser(registeredUser);
+
+                // Navigate To Confirmation Page
+                this.router.navigate(['/register/confirm'], {queryParams: {email: registeredUser.email, username: registeredUser.username}});
             });
-   
     }
 }
 
